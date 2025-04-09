@@ -1,0 +1,28 @@
+# Ambiente virtual
+venv/
+.env/
+
+# Arquivos Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+
+# Configs do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.bak
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+
+# Imagens cacheadas por PGZero
