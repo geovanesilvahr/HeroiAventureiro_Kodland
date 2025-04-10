@@ -2,7 +2,7 @@
 import random
 
 import pgzrun
-from pgzero.actor import Actor
+from pygame import Rect
 
 WIDTH = 600
 HEIGHT = 600
@@ -35,42 +35,44 @@ map_data = generate_map(30, 40)
 
 class Character:
     def __init__(self, image_base, pos):
-        self.image_base = image_base 
+        self.image_base = image_base
+        self.image = image_base
+        self.x, self.y = pos
         self.frame = 0
-        self.actor = Actor(f"{self.image_base}", pos)
         self.hp = 100
         self.attack_range = 40
         self.damage = 10
         self.timer = 0
 
     def move(self, dx, dy):
-        new_x = self.actor.x + dx
-        new_y = self.actor.y + dy
+        new_x = self.x + dx
+        new_y = self.y + dy
         if not is_colliding(new_x, new_y):
-            self.actor.x = new_x
-            self.actor.y = new_y
+            self.x = new_x
+            self.y = new_y
         self.animate()
 
     def animate(self):
         self.timer += 1
         if self.timer >= 10:
             self.frame = (self.frame + 1) % 2
-            self.actor.image = self.image_base
+            self.image = self.image_base
             self.timer = 0
 
     def attack(self, enemies):
         for enemy in enemies:
-            if self.actor.distance_to(enemy.actor) < self.attack_range:
+            if distance_to(self, enemy) < self.attack_range:
                 enemy.take_damage(self.damage)
 
     def draw(self):
-        self.actor.draw()
+        screen.blit(self.image, (self.x, self.y))
 
 class Enemy:
     def __init__(self, image, pos, bounds):
-        self.actor = Actor(image, pos)
-        self.hp = 30
+        self.image = image
+        self.x, self.y = pos
         self.bounds = bounds
+        self.hp = 30
         self.wait_time = 0
 
     def patrol(self):
@@ -80,11 +82,11 @@ class Enemy:
         if self.wait_time >= 30:
             dx = random.choice([-TILE_SIZE, 0, TILE_SIZE])
             dy = random.choice([-TILE_SIZE, 0, TILE_SIZE])
-            new_x = self.actor.x + dx
-            new_y = self.actor.y + dy
+            new_x = self.x + dx
+            new_y = self.y + dy
             if self.bounds.collidepoint((new_x, new_y)) and not is_colliding(new_x, new_y):
-                self.actor.x = new_x
-                self.actor.y = new_y
+                self.x = new_x
+                self.y = new_y
             self.wait_time = 0
 
     def take_damage(self, dmg):
@@ -93,13 +95,10 @@ class Enemy:
 
     def draw(self):
         if self.hp > 0:
-            self.actor.draw()
+            screen.blit(self.image, (self.x, self.y))
 
-hero = Character("tile_0098", (TILE_SIZE * 6, TILE_SIZE * 6))
-enemies = [
-    Enemy("tile_0122", (TILE_SIZE * 10, TILE_SIZE * 5), Rect(80, 64, 96, 96)),
-    Enemy("tile_0122", (TILE_SIZE * 14, TILE_SIZE * 7), Rect(160, 96, 64, 96))
-]
+def distance_to(a, b):
+    return ((a.x - b.x)**2 + (a.y - b.y)**2)**0.5
 
 def draw():
     screen.clear()
@@ -159,5 +158,11 @@ def is_colliding(x, y):
     if 0 <= row < len(map_data) and 0 <= col < len(map_data[0]):
         return map_data[row][col] in (1, 2)
     return True
+
+hero = Character("tile_0098", (TILE_SIZE * 6, TILE_SIZE * 6))
+enemies = [
+    Enemy("tile_0122", (TILE_SIZE * 10, TILE_SIZE * 5), Rect(80, 64, 96, 96)),
+    Enemy("tile_0122", (TILE_SIZE * 14, TILE_SIZE * 7), Rect(160, 96, 64, 96))
+]
 
 pgzrun.go()
