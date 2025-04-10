@@ -130,10 +130,10 @@ def draw_map():
 def update():
     if game_state == GAME:
         dx = dy = 0
-        if keyboard.right: dx = 2
-        if keyboard.left: dx = -2
-        if keyboard.up: dy = -2
-        if keyboard.down: dy = 2
+        if keyboard.right: dx = 1
+        if keyboard.left: dx = -1
+        if keyboard.up: dy = -1
+        if keyboard.down: dy = 1
         hero.move(dx, dy)
         for enemy in enemies:
             enemy.patrol()
